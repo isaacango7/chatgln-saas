@@ -57,13 +57,24 @@ function createSession(assistantId) {
 
       headless: true,
 
+      executablePath:
+
+        process.env
+          .PUPPETEER_EXECUTABLE_PATH ||
+
+        '/usr/bin/chromium-browser',
+
       args: [
 
         '--no-sandbox',
 
         '--disable-setuid-sandbox',
 
-        '--disable-dev-shm-usage'
+        '--disable-dev-shm-usage',
+
+        '--disable-accelerated-2d-canvas',
+
+        '--disable-gpu'
 
       ]
 
@@ -106,6 +117,36 @@ function createSession(assistantId) {
   })
 
   // ====================================
+  // AUTH FAILURE
+  // ====================================
+
+  client.on('auth_failure', (msg) => {
+
+    console.log('\n====================')
+    console.log('AUTH FAILURE')
+    console.log('====================\n')
+
+    console.log(msg)
+
+  })
+
+  // ====================================
+  // DISCONNECTED
+  // ====================================
+
+  client.on('disconnected', (reason) => {
+
+    connectedSessions[assistantId] = false
+
+    console.log('\n====================')
+    console.log('DISCONNECTED')
+    console.log('====================\n')
+
+    console.log(reason)
+
+  })
+
+  // ====================================
   // MESSAGE
   // ====================================
 
@@ -114,7 +155,7 @@ function createSession(assistantId) {
     try {
 
       // ====================================
-      // IGNORE OWN MESSAGES
+      // IGNORE OWN
       // ====================================
 
       if (message.fromMe) {
@@ -138,7 +179,7 @@ function createSession(assistantId) {
       }
 
       // ====================================
-      // IGNORE BROADCASTS
+      // IGNORE BROADCAST
       // ====================================
 
       if (message.broadcast) {
@@ -261,7 +302,7 @@ app.get('/', (req, res) => {
 })
 
 // ====================================
-// START ASSISTANT
+// START
 // ====================================
 
 app.get('/start/:assistantId', (req, res) => {
