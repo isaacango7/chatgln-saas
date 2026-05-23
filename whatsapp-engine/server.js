@@ -57,13 +57,6 @@ function createSession(assistantId) {
 
       headless: true,
 
-      executablePath:
-
-        process.env
-          .PUPPETEER_EXECUTABLE_PATH ||
-
-        '/usr/bin/chromium-browser',
-
       args: [
 
         '--no-sandbox',
@@ -154,41 +147,21 @@ function createSession(assistantId) {
 
     try {
 
-      // ====================================
-      // IGNORE OWN
-      // ====================================
-
       if (message.fromMe) {
         return
       }
-
-      // ====================================
-      // IGNORE GROUPS
-      // ====================================
 
       if (message.from.includes('@g.us')) {
         return
       }
 
-      // ====================================
-      // IGNORE STATUS
-      // ====================================
-
       if (message.from === 'status@broadcast') {
         return
       }
 
-      // ====================================
-      // IGNORE BROADCAST
-      // ====================================
-
       if (message.broadcast) {
         return
       }
-
-      // ====================================
-      // IGNORE EMPTY
-      // ====================================
 
       if (!message.body) {
         return
@@ -199,10 +172,6 @@ function createSession(assistantId) {
       console.log('====================\n')
 
       console.log(message.body)
-
-      // ====================================
-      // AI API
-      // ====================================
 
       const response =
         await axios.post(
@@ -230,10 +199,6 @@ function createSession(assistantId) {
 
       console.log(response.data)
 
-      // ====================================
-      // ASSISTANT OFF
-      // ====================================
-
       if (
 
         !response.data.assistant_status
@@ -243,10 +208,6 @@ function createSession(assistantId) {
         return
 
       }
-
-      // ====================================
-      // SEND MESSAGE
-      // ====================================
 
       await client.sendMessage(
 
@@ -474,32 +435,6 @@ button {
 
   cursor: pointer;
 
-  transition: 0.2s;
-
-}
-
-button:hover {
-
-  opacity: 0.9;
-
-}
-
-.success {
-
-  font-size: 28px;
-
-  font-weight: bold;
-
-  margin-bottom: 15px;
-
-}
-
-.connected {
-
-  color: #aaaaaa;
-
-  margin-top: 10px;
-
 }
 
 .loader {
@@ -550,7 +485,7 @@ ChatGLN
 
 <div class="subtitle">
 
-Connexion WhatsApp sécurisée
+Génération du QR Code...
 
 </div>
 
@@ -574,10 +509,6 @@ async function loadQR() {
 
   const data = await response.json()
 
-  // =========================
-  // CONNECTED
-  // =========================
-
   if (data.connected) {
 
     document.getElementById(
@@ -592,59 +523,23 @@ async function loadQR() {
 
       </div>
 
-      <div class="success">
+      <h1>
 
         Connecté ✅
 
-      </div>
-
-      <div class="connected">
-
-        WhatsApp est maintenant connecté
-
-      </div>
+      </h1>
 
     \`
 
     return
 
   }
-
-  // =========================
-  // WAITING QR
-  // =========================
 
   if (!data.qr) {
 
-    document.getElementById(
-
-      'content'
-
-    ).innerHTML = \`
-
-      <div class="logo">
-
-        ChatGLN
-
-      </div>
-
-      <div class="subtitle">
-
-        Génération du QR Code...
-
-      </div>
-
-      <div class="loader"></div>
-
-    \`
-
     return
 
   }
-
-  // =========================
-  // SHOW QR
-  // =========================
 
   const qrImage =
 
@@ -676,11 +571,11 @@ async function loadQR() {
 
     </div>
 
-    <a href="\${qrImage}" download="chatgln-qr.png">
+    <a href="\${qrImage}" download>
 
       <button>
 
-        Télécharger QR Code
+        Télécharger QR
 
       </button>
 
@@ -705,7 +600,7 @@ setInterval(loadQR, 3000)
 })
 
 // ====================================
-// QR DATA API
+// QR DATA
 // ====================================
 
 app.get('/qr-data/:assistantId', (req, res) => {
